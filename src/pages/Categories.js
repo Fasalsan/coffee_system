@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { DataCategories } from '../components/navigation';
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { RiEditFill } from "react-icons/ri";
+import Modal from '../components/Modal';
 
 
 
 
 export default function Categories() {
     const [search, setSearch] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
     const [data] = useState([
         { id: 1, name: 'Espresso', price: '$3.00' },
@@ -40,6 +45,7 @@ export default function Categories() {
                 />
 
                 <button
+                    onClick={openModal}
                     className='bg-[#f5a65d] px-12 py-2 rounded-lg text-white'
                 >Add+</button>
             </div>
@@ -94,8 +100,41 @@ export default function Categories() {
                     </tbody>
                 </table>
 
-                
+
             </div>
+
+
+
+            {/* Modal */}
+            <Modal isOpen={isModalOpen} onClose={closeModal}>
+                <h2 className="text-lg font-bold mb-4">Create Category</h2>
+                <div className='flex flex-col gap-3'>
+                    {/* content */}
+                    <div>
+                        <input type="text" placeholder='CategoryName'
+                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
+                        />
+
+
+                    </div>
+
+                    {/* button */}
+                    <div className='flex justify-end gap-2'>
+                        <button
+                            className="bg-blue-500 text-white px-3 py-2 rounded-lg"
+                            onClick={() => alert("Added")}
+                        >
+                            Save
+                        </button>
+                        <button
+                            className="bg-red-500 text-white px-3 py-2 rounded-lg"
+                            onClick={closeModal}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     )
 }
