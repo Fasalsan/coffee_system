@@ -13,7 +13,6 @@ const User = () => {
   const getUser = async () => {
     const res = await request("User/GetAll", "get")
     setUSer(res)
-    console.log("isData", res)
   }
 
   return <DataTableUser data={user} itemsPerPage={7} reloadNewUser={getUser} />

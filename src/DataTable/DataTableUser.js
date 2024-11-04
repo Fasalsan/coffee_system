@@ -4,17 +4,17 @@ import { RiEditFill } from "react-icons/ri";
 import Modal from "../components/Modal";
 import Propconfirm from "../components/Propconfirm";
 import request from "../util/helper";
-import axios from "axios";
-import { CirclesWithBar } from "react-loader-spinner";
 import Loading from "../components/shared/Loading";
 
 const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalCreate, setIsModalCreate] = useState(false);
+    const [isModalUpdate, setIsModalUpdate] = useState(false);
     const [propconfirm, setPropconfirm] = useState(false);
     const [userID, setUserID] = useState()
-    const [loading, setLoading] = useState(true);
+    const [isId, setIsId] = useState();
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -27,22 +27,67 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
+    // handlOpenPropconfirm
+    const handlOpenPropconfirm = (id) => {
+        setUserID(id)
+        setPropconfirm(true)
+    }
 
-    // const CreateUser = async () => {
-    //     try {
-    //         await request(`User/Post`, "post", { formData })
-    //         newUser();
-    //         //   setPropconfirm(false);
-    //     } catch (err) {
+    const handleOpenModalCreate = () => {
+        setIsModalUpdate(false)
+        setIsModalCreate(true)
+    }
 
-    //     }
-    // }
+    const handleEdit = (item) => {
+        setIsModalUpdate(true)
+        setIsModalCreate(false)
+        setFormData(item)
+        setIsId(item.id)
+    }
 
-    const RemoveUser = async () => {
-        const id = userID
+    // UpadateUser
+    const UpdateUser = async () => {
+        const id = isId
+        try {
+            await request(`User/Update?id=${id}`, "Put", formData)
+            reloadNewUser();
+            setLoading(!true)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
         setLoading(true);
-        setPropconfirm(false);
+        setIsModalUpdate(false);
         await new Promise((resolve) => setTimeout(resolve, 2000));
+        UpdateUser();
+    }
+
+    // CreateUser
+    const SaveUser = async () => {
+        try {
+            await request(`User/Post`, "post", formData)
+            reloadNewUser();
+            setLoading();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setIsModalCreate(false);
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        SaveUser();
+
+    };
+
+    // RemoveUser
+    const DeleteUser = async () => {
+        const id = userID
         try {
             await request(`User/Delete?id=${id}`, "delete",)
             reloadNewUser();
@@ -52,29 +97,12 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
         }
     }
 
-    // handlOpenPropconfirm
-    const handlOpenPropconfirm = (id) => {
-        setUserID(id)
-        setPropconfirm(true)
-    }
-
-    // DeleteUser
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsModalOpen(false);
+    const RemoveUser = async () => {
         setLoading(true);
+        setPropconfirm(false);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        try {
-            await axios.post("https://localhost:7014/api/User/Post", formData);
-            reloadNewUser();
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+        DeleteUser();
+    }
 
     // Calculate total pages
     const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -94,7 +122,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
     const filteredData = currentData.filter(item =>
         item.name?.toLowerCase().includes(search.toLowerCase()) // Use optional chaining (?.) to check if 'name' exists
     );
-
+   
     return (
         <div className="container mx-auto">
             {loading && (<Loading />)}
@@ -106,7 +134,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                     className='border border-[#f5a65d] w-[25%] px-4 py-2 focus:outline-none rounded-lg'
                 />
                 <button
-                    onClick={openModal}
+                    onClick={handleOpenModalCreate}
                     className='bg-[#f5a65d] px-12 py-2 rounded-lg text-white'
                 >Add+</button>
             </div>
@@ -134,7 +162,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                     <tbody>
                         {
                             filteredData.length > 0 ? (
-                                currentData.map((item, i) => (
+                                filteredData.map((item, i) => (
                                     <tr key={item.id}
                                         className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100"
                                     >
@@ -149,6 +177,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                                                     className='text-red-600 text-[20px] cursor-pointer'
                                                 />
                                                 <RiEditFill
+                                                    onClick={() => handleEdit(item)}
                                                     className='text-green-600 text-[20px] cursor-pointer'
                                                 />
                                             </div>
@@ -224,13 +253,13 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                 </div>
             </Propconfirm>
 
-            {/* Modal */}
-            <Modal isOpen={isModalOpen} onClose={closeModal}>
+            {/* Modal  Create*/}
+            <Modal isOpen={isModalCreate} onClose={() => setIsModalCreate(false)}>
                 <h2 className="text-lg font-bold mb-4">Create User</h2>
                 <div className='flex flex-col gap-3'>
                     {/* content */}
                     <form
-                        onSubmit={handleSubmit}
+                        onSubmit={handleSave}
                         className="flex flex-col gap-2">
                         <input
                             type="text"
@@ -266,7 +295,60 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                             </button>
                             <button
                                 className="bg-red-500 text-white px-3 py-2 rounded-lg"
-                                onClick={closeModal}
+                                onClick={() => setIsModalCreate(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </form>
+
+
+                </div>
+            </Modal>
+
+            {/* Modal  Update*/}
+            <Modal isOpen={isModalUpdate} onClose={() => setIsModalUpdate(false)}>
+                <h2 className="text-lg font-bold mb-4">Update User</h2>
+                <div className='flex flex-col gap-3'>
+                    {/* content */}
+                    <form
+                        onSubmit={handleUpdate}
+                        className="flex flex-col gap-2">
+                        <input
+                            type="text"
+                            placeholder='userName'
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
+                        />
+                        <input
+                            type="text"
+                            placeholder='phone'
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
+                        />
+                        <input
+                            type="text"
+                            placeholder='address'
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
+                        />
+
+                        {/* button */}
+                        <div className='flex justify-end gap-2'>
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-3 py-2 rounded-lg">
+                                Update
+                            </button>
+                            <button
+                                className="bg-red-500 text-white px-3 py-2 rounded-lg"
+                                onClick={() => setIsModalUpdate(false)}
                             >
                                 Close
                             </button>

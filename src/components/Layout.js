@@ -22,7 +22,6 @@ export default function Layout() {
 
                             <HiOutlineUserCircle
                                 className="text-5xl text-white"
-
                                 onClick={() => uerLogin()}
                             />
 

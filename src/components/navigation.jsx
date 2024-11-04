@@ -14,6 +14,11 @@ export const sidebar = [
     label: "User",
     path: "/user",
   },
+  {
+    id: 4,
+    label: "Order",
+    path: "/order",
+  },
 ];
 
 // -----------------------------------------Category-------------------------
