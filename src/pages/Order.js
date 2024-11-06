@@ -1,40 +1,55 @@
 import React, { useState } from 'react';
+import ModalUser from '../components/modal/ModalUser';
+
 
 function Order() {
-  // State to store the category name
-  const [categoryName, setCategoryName] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
-  // Handle input change
-  const handleInputChange = (event) => {
-    setCategoryName(event.target.value);
+  const handleCreate = () => {
+    setIsEditMode(false);
+    setSelectedData(null);
+    setIsModalOpen(true);
   };
 
-  // Handle form submission
-  const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent page reload
-    console.log("Category Name Submitted:", categoryName); // Log the category name
-    setSubmitted(true); // Set submitted state to true
-    setCategoryName(''); // Clear the input after submission
+  const handleEdit = (item) => {
+    setIsEditMode(true);
+    setSelectedData(item);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (data) => {
+    if (isEditMode) {
+      // Handle update logic here
+      console.log('Updated item:', data);
+    } else {
+      // Handle create logic here
+      console.log('Created item:', data);
+    }
   };
 
   return (
     <div>
       <h2>Submit a Category</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Category Name:
-          <input
-            type="text"
-            value={categoryName}
-            onChange={handleInputChange}
-            placeholder="Enter category name"
-            required
-          />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-      {submitted && <p>Category "{categoryName}" submitted successfully!</p>}
+
+
+      <button onClick={handleCreate} className="px-4 py-2 bg-blue-600 text-white rounded">
+        Create Item
+      </button>
+      <button
+        onClick={() => handleEdit({ name: 'John Doe', email: 'john@example.com' })}
+        className="px-4 py-2 bg-green-600 text-white rounded ml-2"
+      >
+        Edit Item
+      </button>
+      <ModalUser
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        initialData={selectedData}
+        mode={isEditMode ? 'update' : 'create'}
+      />
     </div>
   );
 }

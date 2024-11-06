@@ -1,96 +1,72 @@
 import { useState } from "react";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { RiEditFill } from "react-icons/ri";
-import Modal from "../components/Modal";
 import Propconfirm from "../components/Propconfirm";
 import request from "../util/helper";
 import Loading from "../components/shared/Loading";
+import ModalUser from "../components/modal/ModalUser";
 
 const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
-    const [isModalCreate, setIsModalCreate] = useState(false);
-    const [isModalUpdate, setIsModalUpdate] = useState(false);
     const [propconfirm, setPropconfirm] = useState(false);
-    const [userID, setUserID] = useState()
     const [isId, setIsId] = useState();
     const [loading, setLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [selectedData, setSelectedData] = useState(null);
 
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        address: '',
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
+    const handleCreate = () => {
+        setIsEditMode(false);
+        setSelectedData(null);
+        setIsModalOpen(true);
     };
+
+    const handleEdits = (item) => {
+        setIsEditMode(true);
+        setSelectedData(item);
+        setIsModalOpen(true);
+        setIsId(item.id)
+    };
+
+    const handlFindUserId = () => {
+
+    }
+
+
 
     // handlOpenPropconfirm
     const handlOpenPropconfirm = (id) => {
-        setUserID(id)
+        setIsId(id)
         setPropconfirm(true)
     }
 
-    const handleOpenModalCreate = () => {
-        setIsModalUpdate(false)
-        setIsModalCreate(true)
+    // CreateNewUser
+    const CreateUser = (data) => {
+        try {
+            request(`User/Post`, "post", data)
+            reloadNewUser();
+        } catch (error) {
+            console.error(error);
+        }
     }
-
-    const handleEdit = (item) => {
-        setIsModalUpdate(true)
-        setIsModalCreate(false)
-        setFormData(item)
-        setIsId(item.id)
-    }
-
     // UpadateUser
-    const UpdateUser = async () => {
+    const UpdateUser = (data) => {
         const id = isId
         try {
-            await request(`User/Update?id=${id}`, "Put", formData)
-            reloadNewUser();
-            setLoading(!true)
+            request(`User/Update?id=${id}`, "Put", data)
+            reloadNewUser()
+            // alert("hellloo")
         } catch (error) {
             console.error(error);
         }
     }
-
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setIsModalUpdate(false);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        UpdateUser();
-    }
-
-    // CreateUser
-    const SaveUser = async () => {
-        try {
-            await request(`User/Post`, "post", formData)
-            reloadNewUser();
-            setLoading();
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const handleSave = async (e) => {
-        e.preventDefault();
-        setIsModalCreate(false);
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        SaveUser();
-
-    };
-
     // RemoveUser
     const DeleteUser = async () => {
-        const id = userID
+        const id = isId
         try {
             await request(`User/Delete?id=${id}`, "delete",)
-            reloadNewUser();
+            reloadNewUser()
             setLoading(false);
         } catch (err) {
 
@@ -103,6 +79,24 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         DeleteUser();
     }
+
+    // FormSubmit
+    const handleSubmit = async (data) => {
+        setIsModalOpen(false)
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (isEditMode) {
+            UpdateUser(data);
+            setLoading(false);
+            reloadNewUser();
+
+        } else {
+            await CreateUser(data);
+            setLoading(false);
+            reloadNewUser();
+        }
+    }
+
 
     // Calculate total pages
     const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -122,7 +116,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
     const filteredData = currentData.filter(item =>
         item.name?.toLowerCase().includes(search.toLowerCase()) // Use optional chaining (?.) to check if 'name' exists
     );
-   
+
     return (
         <div className="container mx-auto">
             {loading && (<Loading />)}
@@ -134,7 +128,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                     className='border border-[#f5a65d] w-[25%] px-4 py-2 focus:outline-none rounded-lg'
                 />
                 <button
-                    onClick={handleOpenModalCreate}
+                    onClick={handleCreate}
                     className='bg-[#f5a65d] px-12 py-2 rounded-lg text-white'
                 >Add+</button>
             </div>
@@ -155,6 +149,9 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                                 Address
                             </th>
                             <th scope="col" className="px-6 py-3">
+                                Email
+                            </th>
+                            <th scope="col" className="px-6 py-3">
                                 Action
                             </th>
                         </tr>
@@ -170,6 +167,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                                         <td>{item.name}</td>
                                         <td>{item.phone}</td>
                                         <td>{item.address}</td>
+                                        <td>{item.email}</td>
                                         <td className="px-6 py-4">
                                             <div className='flex gap-4'>
                                                 <RiDeleteBin5Fill
@@ -177,7 +175,7 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                                                     className='text-red-600 text-[20px] cursor-pointer'
                                                 />
                                                 <RiEditFill
-                                                    onClick={() => handleEdit(item)}
+                                                    onClick={() => handleEdits(item)}
                                                     className='text-green-600 text-[20px] cursor-pointer'
                                                 />
                                             </div>
@@ -253,111 +251,14 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
                 </div>
             </Propconfirm>
 
-            {/* Modal  Create*/}
-            <Modal isOpen={isModalCreate} onClose={() => setIsModalCreate(false)}>
-                <h2 className="text-lg font-bold mb-4">Create User</h2>
-                <div className='flex flex-col gap-3'>
-                    {/* content */}
-                    <form
-                        onSubmit={handleSave}
-                        className="flex flex-col gap-2">
-                        <input
-                            type="text"
-                            placeholder='userName'
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='phone'
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='address'
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-
-                        {/* button */}
-                        <div className='flex justify-end gap-2'>
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-3 py-2 rounded-lg">
-                                Save
-                            </button>
-                            <button
-                                className="bg-red-500 text-white px-3 py-2 rounded-lg"
-                                onClick={() => setIsModalCreate(false)}
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </form>
-
-
-                </div>
-            </Modal>
-
-            {/* Modal  Update*/}
-            <Modal isOpen={isModalUpdate} onClose={() => setIsModalUpdate(false)}>
-                <h2 className="text-lg font-bold mb-4">Update User</h2>
-                <div className='flex flex-col gap-3'>
-                    {/* content */}
-                    <form
-                        onSubmit={handleUpdate}
-                        className="flex flex-col gap-2">
-                        <input
-                            type="text"
-                            placeholder='userName'
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='phone'
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='address'
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-
-                        {/* button */}
-                        <div className='flex justify-end gap-2'>
-                            <button
-                                type="submit"
-                                className="bg-blue-500 text-white px-3 py-2 rounded-lg">
-                                Update
-                            </button>
-                            <button
-                                className="bg-red-500 text-white px-3 py-2 rounded-lg"
-                                onClick={() => setIsModalUpdate(false)}
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </form>
-
-
-                </div>
-            </Modal>
+            {/* ModalPopup */}
+            <ModalUser
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleSubmit}
+                initialData={selectedData}
+                mode={isEditMode ? 'update' : 'create'}
+            />
         </div>
     );
 };

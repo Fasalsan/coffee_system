@@ -19,12 +19,10 @@ export default function Layout() {
                             <h1 className='text-white text-xl'><Breadcrumbs /></h1>
                         </div>
                         <div>
-
                             <HiOutlineUserCircle
                                 className="text-5xl text-white"
                                 onClick={() => uerLogin()}
                             />
-
                         </div>
                     </div>
                     <div className='px-8 py-4'>

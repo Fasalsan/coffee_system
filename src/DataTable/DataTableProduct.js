@@ -1,35 +1,99 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { RiEditFill } from "react-icons/ri";
-import Modal from "../components/Modal";
+import request from '../util/helper';
+import Loading from "../components/shared/Loading";
+import Propconfirm from "../components/Propconfirm";
+import ModalProduct from '../components/modal/ModalProduct';
 
-const DataTableProduct = ({ data, itemsPerPage}) => {
+export default function DataTableProduct({ data, itemsPerPage, reloadProduct }) {
     const [currentPage, setCurrentPage] = useState(1);
-
+    const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [propconfirm, setPropconfirm] = useState(false);
+    const [isId, setIsId] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        email: '',
-    });
-    // Step 3: Handle input changes dynamically
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [selectedData, setSelectedData] = useState(null);
+
+    const handleCreate = () => {
+        setIsEditMode(false);
+        setSelectedData(null);
+        setIsModalOpen(true);
     };
 
-    // Step 4: Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Handle form data submission (e.g., log or send to server)
-        console.log(formData);
+    const handleEdits = (item) => {
+        setIsEditMode(true);
+        setSelectedData(item);
+        setIsModalOpen(true);
+        setIsId(item.id)
     };
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    // handlOpenPropconfirm
+    const handlOpenPropconfirm = (id) => {
+        setIsId(id)
+        setPropconfirm(true)
+    }
+
+    // CreateNewProduct
+    const CreateProduct = (data) => {
+        try {
+            request(`Product/Post`, "post", data)
+            reloadProduct();
+            reloadProduct();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    // UpadateProduct
+    const UpdateProduct = (data) => {
+        const id = isId
+        try {
+            request(`Product/Update?id=${id}`, "Put", data)
+            reloadProduct();
+            reloadProduct();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // RemoveProduct
+    const DeleteProduct = async () => {
+        const id = isId
+        try {
+            await request(`Product/Delete?id=${id}`, "delete",)
+            reloadProduct();
+            setLoading(false);
+        } catch (err) {
+
+        }
+    }
+
+    // onConfirmRemoveProduct
+    const RemoveProduct = async () => {
+        setLoading(true);
+        setPropconfirm(false);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        DeleteProduct();
+    }
+
+    // FormSubmit
+    const handleSubmit = async (data) => {
+        setIsModalOpen(false)
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (isEditMode) {
+            UpdateProduct(data);
+            setLoading(false);
+            reloadProduct();
+
+        } else {
+            await CreateProduct(data);
+            setLoading(false);
+            reloadProduct();
+        }
+    }
+
 
     // Calculate total pages
     const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -45,19 +109,26 @@ const DataTableProduct = ({ data, itemsPerPage}) => {
         setCurrentPage(pageNumber);
     };
 
+    // Filter the data based on the search term
+    const filteredData = currentData.filter(item =>
+        item.name?.toLowerCase().includes(search.toLowerCase()) // Use optional chaining (?.) to check if 'name' exists
+    );
     return (
-        <div className="container mx-auto">
+        <div>
 
             <div className='flex justify-between items-center bg-white px-4 py-4 mb-4 shadow-md'>
+
+                {loading && (<Loading />)}
                 <input type="text"
                     placeholder='Search By Name'
-                    // value={search}
-                    // onChange={(e) => setSearch(e.target.value)}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     className='border border-[#f5a65d] w-[25%] px-4 py-2 focus:outline-none rounded-lg'
                 />
 
                 <button
-                    onClick={openModal}
+                    // onClick={() => setModalCreate(true)}
+                    onClick={handleCreate}
                     className='bg-[#f5a65d] px-12 py-2 rounded-lg text-white'
                 >Add+</button>
             </div>
@@ -70,10 +141,13 @@ const DataTableProduct = ({ data, itemsPerPage}) => {
                                 ID
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                ProductName
+                                Product
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Price
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Category
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Action
@@ -81,38 +155,39 @@ const DataTableProduct = ({ data, itemsPerPage}) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            currentData && currentData.map((item, i) => {
-                                return (
-                                    <tr key={i} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100">
-                                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {item.id}
-                                        </th>
-                                        <td className="px-6 py-4">
-                                            {item.name}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {item.price}$
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className='flex gap-4'>
-                                                <RiDeleteBin5Fill
-                                                    // onClick={() => handlDelete(item.id)}
-                                                    className='text-red-600 text-[20px] cursor-pointer'
-                                                />
-                                                <RiEditFill
-                                                    className='text-green-600 text-[20px] cursor-pointer'
-                                                />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        }
+                        {filteredData.length > 0 ? (
+                            filteredData.map((item, i) => (
+                                <tr key={item.id}
+                                    className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100"
+                                >
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{i + 1}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.price} $</td>
+                                    <td>{item.categoryModel.name
+                                    }</td>
+                                    <td className="px-6 py-4">
+                                        <div className='flex gap-4'>
+                                            <RiDeleteBin5Fill
+                                                onClick={() => handlOpenPropconfirm(item.id)}
+                                                className='text-red-600 text-[20px] cursor-pointer'
+                                            />
+                                            <RiEditFill
+                                                onClick={() => handleEdits(item)}
+                                                className='text-green-600 text-[20px] cursor-pointer'
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <div className='flex justify-center items-center w-full p-12'>
+                                <h1 className='text-red-600 text-3xl'> No data found</h1>
+                            </div>
+                        )}
+
                     </tbody>
                 </table>
             </div>
-
             {/* Pagination Controls */}
             <div className="mt-4 flex justify-center">
                 <button
@@ -141,7 +216,6 @@ const DataTableProduct = ({ data, itemsPerPage}) => {
                         </button>
                     )
                 )}
-
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
@@ -153,61 +227,30 @@ const DataTableProduct = ({ data, itemsPerPage}) => {
                     Next
                 </button>
             </div>
+            {/* Propconfirm */}
+            <Propconfirm isOpenProp={propconfirm}>
+                <div className="flex flex-col gap-7">
+                    <p>Are you Sure to delete this task!</p>
 
-
-
-            {/* Modal */}
-            <Modal isOpen={isModalOpen} onClose={closeModal}>
-                <h2 className="text-lg font-bold mb-4">Create User</h2>
-                <div className='flex flex-col gap-3'>
-                    {/* content */}
-                    <form
-                        onSubmit={handleSubmit}
-                        className="flex flex-col gap-2">
-                        <input
-                            type="text"
-                            placeholder='userName'
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='phone'
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                        <input
-                            type="text"
-                            placeholder='email'
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
-                        />
-                    </form>
-
-                    {/* button */}
-                    <div className='flex justify-end gap-2'>
+                    <div className="flex justify-end gap-2">
                         <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-3 py-2 rounded-lg">
-                            Save
-                        </button>
+                            onClick={RemoveProduct}
+                            className="bg-blue-600 px-9 py-2
+                            text-white rounded-lg">Yes</button>
                         <button
-                            className="bg-red-500 text-white px-3 py-2 rounded-lg"
-                            onClick={closeModal}
-                        >
-                            Close
-                        </button>
+                            onClick={() => setPropconfirm(false)}
+                            className="bg-red-600 px-9 py-2 text-white rounded-lg">No</button>
                     </div>
                 </div>
-            </Modal>
+            </Propconfirm>
+            {/* Modal */}
+            <ModalProduct
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleSubmit}
+                initialData={selectedData}
+                mode={isEditMode ? 'update' : 'create'}
+            />
         </div>
-    );
-};
-
-export default DataTableProduct;
+    )
+}

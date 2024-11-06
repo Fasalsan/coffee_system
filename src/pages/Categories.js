@@ -8,6 +8,7 @@ export default function Categories() {
     useEffect(() => {
         getCategory();
     }, []);
+    console.log(category)
 
     const getCategory = async () => {
         const response = await request("Category/GetAll", "get")
@@ -15,6 +16,6 @@ export default function Categories() {
     }
 
     return (
-        <DataTableCategory data={category} itemsPerPage={5}/>
+        <DataTableCategory data={category} itemsPerPage={5} reloadCategory={getCategory}/>
     )
 }
