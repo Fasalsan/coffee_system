@@ -1,25 +1,44 @@
-import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Layout from './components/Layout'
-import Products from './pages/Products'
-import Categories from './pages/Categories'
-import User from './pages/User'
-import NoPage from './pages/NoPage'
-import Order from './pages/Order'
+// App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './auth/AuthContext';
+import Login from './auth/Login';
+import SalesOrder from './pages/SalesOrder';
+import ProtectedRoute from './auth/ProtectedRoute';
+import Layout from './components/Layout';
+import Categories from './pages/Categories';
+import Product from './pages/Products';
+import User from './pages/User';
+import Order from './pages/Order';
+import NoPage from './pages/NoPage';
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Categories />} />
-          <Route path="product" element={<Products />} />
-          <Route path="user" element={<User />} />
-          <Route path='order' element={<Order />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Categories />} />
+            <Route path="product" element={<Product />} />
+            <Route path="user" element={<User />} />
+            <Route path="order" element={<Order />} />
+            <Route path="salesorder" element={<SalesOrder />} />
+            {/* <Route path="*" element={<NoPage />} /> */}
+          </Route>
           <Route path="*" element={<NoPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-
-  )
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
+
+export default App;

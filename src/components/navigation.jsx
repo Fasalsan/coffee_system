@@ -2,22 +2,27 @@ export const sidebar = [
   {
     id: 1,
     label: "Categories",
-    path: "/",
+    path: "/dashboard",
   },
   {
     id: 2,
     label: "Products",
-    path: "/product",
+    path: "/dashboard/product",
   },
   {
     id: 3,
     label: "User",
-    path: "/user",
+    path: "/dashboard/user",
   },
   {
     id: 4,
     label: "Order",
-    path: "/order",
+    path: "/dashboard/order",
+  },
+  {
+    id: 5,
+    label: "SalesOrder",
+    path: "/dashboard/salesorder",
   },
 ];
 

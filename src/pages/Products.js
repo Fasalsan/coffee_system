@@ -7,14 +7,12 @@ export default function Product() {
 
     useEffect(() => {
         getProduct();
-    }, []);
+    }, [product]);
 
     const getProduct = async () => {
         const response = await request("Product/GetAll", "get")
         setProduct(response)
     }
-    console.log(product)
-
     return (
         <DataTableProduct data={product} itemsPerPage={5} reloadProduct={getProduct}/>
       

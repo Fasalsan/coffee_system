@@ -5,14 +5,15 @@ export default function Breadcrumbs() {
     const location = useLocation()
     let currentLink = 'Category'
 
-    const crumbs = location.pathname.split('/')
-        .filter(crumb => crumb !== '')
+    const crumbs = location.pathname.split('/dashboard/')
+        // .filter(crumbs => crumbs === '')
+        .filter(crumb => crumb !== '' )
         .map(crumb => {
             currentLink = + `/${crumb}`
 
             return (
                 <div key={crumb}>
-                    <Link to={currentLink}>{crumb}</Link>
+                    <Link to={currentLink}>{crumb.length > 0 ? crumb : currentLink}</Link>
                 </div>
             )
         });

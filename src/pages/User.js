@@ -7,11 +7,14 @@ const User = () => {
   const [user, setUSer] = useState([]);
 
   useEffect(() => {
+    console.log("usEfect work")
     getUser();
   }, []);
 
   const getUser = async () => {
     const res = await request("User/GetAll", "get")
+
+    console.log("get user",res)
     setUSer(res)
   }
 

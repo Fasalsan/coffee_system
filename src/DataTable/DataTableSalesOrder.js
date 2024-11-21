@@ -6,7 +6,7 @@ import Loading from "../components/shared/Loading";
 import Propconfirm from "../components/Propconfirm";
 import ModalProduct from '../components/modal/ModalProduct';
 
-export default function DataTableProduct({ data, itemsPerPage, reloadProduct }) {
+export default function DataTableSalesOrder({ data, itemsPerPage, reloadProduct }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
@@ -141,13 +141,16 @@ export default function DataTableProduct({ data, itemsPerPage, reloadProduct }) 
                                 ID
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Product
+                                CreatBy
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Price
+                                Customer
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Category
+                                OrderDate
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                TotalAmount
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Action
@@ -157,14 +160,14 @@ export default function DataTableProduct({ data, itemsPerPage, reloadProduct }) 
                     <tbody>
                         {filteredData.length > 0 ? (
                             filteredData.map((item, i) => (
-                                <tr key={item.id}
+                                <tr key={item.orderId}
                                     className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-100"
                                 >
                                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{i + 1}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.price}</td>
-                                    <td>{item.categoryModel.name
-                                    }</td>
+                                    <td>{item.createdBy}</td>
+                                    <td>{item.customerId} $</td>
+                                    <td>{item.orderDate}</td>
+                                    <td>{item.totalAmount}</td>
                                     <td className="px-6 py-4">
                                         <div className='flex gap-4'>
                                             <RiDeleteBin5Fill

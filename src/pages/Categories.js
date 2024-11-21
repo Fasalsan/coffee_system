@@ -7,8 +7,7 @@ export default function Categories() {
 
     useEffect(() => {
         getCategory();
-    }, []);
-    console.log(category)
+    }, [category]);
 
     const getCategory = async () => {
         const response = await request("Category/GetAll", "get")
