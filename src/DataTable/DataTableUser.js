@@ -28,13 +28,6 @@ const DataTableUser = ({ data, itemsPerPage, reloadNewUser }) => {
         setIsModalOpen(true);
         setIsId(item.id)
     };
-
-    const handlFindUserId = () => {
-
-    }
-
-
-
     // handlOpenPropconfirm
     const handlOpenPropconfirm = (id) => {
         setIsId(id)

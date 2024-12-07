@@ -3,11 +3,15 @@ import { Outlet } from 'react-router-dom'
 import SideBar from './shared/SideBar'
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import Breadcrumbs from './Breadcrumbs';
+import { useNavigate } from 'react-router-dom';
 
 export default function Layout() {
-    const uerLogin = () => {
-        alert("hello")
-    }
+
+    const navigate = useNavigate();
+    const logout = () => {
+        localStorage.removeItem("authToken");
+        navigate("/")
+    };
     return (
         <>
             <div className='flex'>
@@ -21,7 +25,7 @@ export default function Layout() {
                         <div>
                             <HiOutlineUserCircle
                                 className="text-5xl text-white"
-                                onClick={() => uerLogin()}
+                                onClick={() => logout()}
                             />
                         </div>
                     </div>

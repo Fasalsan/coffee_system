@@ -3,34 +3,50 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../components/shared/Loading';
+import { Config } from '../util/config';
+import axios from 'axios';
 
 function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate(); // For navigation after login
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    // Mock login logic; replace with real authentication in a real app
-    if (username === 'fasal' && password === '123') {
-      const mockUser = { name: username };
-      login(mockUser); // Log the user in
-      navigate('/dashboard');
-      setLoading(false) // Redirect to dashboard
-    } else {
-      setError('Invalid username or password');
-      setLoading(false)
+    setError(""); // Clear previous errors
+
+    try {
+      // Send login request to API
+      const response = await axios.post(`${Config.base_url}UserLogin`, {
+        email,
+        password,
+      });
+
+      // Extract token and user data from response
+      const { token, user } = response.data;
+
+      // Save the token (e.g., in localStorage for persistence)
+      localStorage.setItem("authToken", token);
+
+      console.log("Logged in user:", user);
+
+      // Redirect to dashboard or any protected route
+      navigate("/dashboard");
+    } catch (error) {
+      // Handle errors, e.g., invalid credentials
+      if (error.response) {
+        setError(error.response.data.message || "Login failed");
+      } else {
+        setError("Network error. Please try again.");
+      }
     }
   };
 
+
   return (
     <div className='absolute bg-hero bg-no-repeat bg-cover w-full h-screen flex justify-center items-center '>
-      {loading && (<Loading />)}
+      {/* {loading && (<Loading />)} */}
       <div className='bg-white w-[30%] px-6 py-9 rounded-2xl shadow-2xl'>
 
 
@@ -40,13 +56,13 @@ function Login() {
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form
           className='flex flex-col gap-4 items-center blur-none z-0 relative'
-          onSubmit={handleSubmit}>
+          onSubmit={handleLogin}>
           <input
             className='border border-[#f5a65d] w-full px-4 py-2 focus:outline-none rounded-lg'
             type="text"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             className='border border-[#f5a65d] w-full px-4 py-2 focus:outline-none rounded-lg'
@@ -59,8 +75,6 @@ function Login() {
           <button
             className='bg-orange-700 px-7 py-2 text-white rounded-lg'
             type="submit">Login</button>
-
-
         </form>
       </div>
     </div>

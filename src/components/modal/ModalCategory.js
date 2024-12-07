@@ -40,7 +40,7 @@ const ModalCategory = ({ isOpen, onClose, onSubmit, initialData, mode = 'create'
                 >
                     <input
                         type="text"
-                        placeholder='userName'
+                        placeholder='CategoryName'
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
