@@ -8,8 +8,8 @@ function Register() {
 
     const [formData, setFormData] = useState({
         name: '',
-        phone: '',
-        address: '',
+        // phone: '',
+        // address: '',
         email: '',
         password: '',
     });
@@ -39,10 +39,11 @@ function Register() {
     // Handles form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setLoading(true)
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         CreateUser();
         await setLoading(false)
-        // navigate("/")
+        navigate("/")
     };
 
     return (
@@ -99,10 +100,11 @@ function Register() {
                     />
                     <button
                         className='bg-orange-700 px-7 py-2 text-white rounded-lg'
-                        type="submit">Save</button>
+                        type="submit">Register</button>
                 </form>
 
-                <div className='flex justify-end items-center'> <a href='/'>Sign In</a></div>
+                {/* <div className='flex justify-end items-center'> <a href='/'>Sign In</a></div> */}
+                <div className='flex gap-4 pt-2 justify-end items-center'>Have an account ? <a href='/' className='text-blue-600'> Sign In</a></div>
 
             </div>
         </div>

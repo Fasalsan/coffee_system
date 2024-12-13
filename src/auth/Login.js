@@ -10,11 +10,15 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // For navigation after login
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  // For navigation after login
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); // Clear previous errors
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
       // Send login request to API
@@ -31,8 +35,9 @@ function Login() {
 
       console.log("Logged in user:", user);
 
+      setLoading(false);
       // Redirect to dashboard or any protected route
-      navigate("/dashboard");
+      await navigate("/dashboard");
     } catch (error) {
       // Handle errors, e.g., invalid credentials
       if (error.response) {
@@ -46,7 +51,7 @@ function Login() {
 
   return (
     <div className='absolute bg-hero bg-no-repeat bg-cover w-full h-screen flex justify-center items-center '>
-      {/* {loading && (<Loading />)} */}
+      {loading && (<Loading />)}
       <div className='bg-white w-[30%] px-6 py-9 rounded-2xl shadow-2xl'>
 
 
@@ -76,11 +81,9 @@ function Login() {
             className='bg-orange-700 px-7 py-2 text-white rounded-lg'
             type="submit">Login</button>
         </form>
-        <div className='flex justify-end items-center'> <a href='/register'>Sign Up</a></div>
+        <div className='flex gap-4 pt-2 justify-end items-center'>No account ? <a href='/register' className='text-blue-600'> Sign Up</a></div>
 
       </div>
-
-
     </div>
   );
 }
