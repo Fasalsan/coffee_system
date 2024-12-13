@@ -76,7 +76,11 @@ function Login() {
             className='bg-orange-700 px-7 py-2 text-white rounded-lg'
             type="submit">Login</button>
         </form>
+        <div className='flex justify-end items-center'> <a href='/register'>Sign Up</a></div>
+
       </div>
+
+
     </div>
   );
 }

@@ -8,9 +8,11 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import Layout from './components/Layout';
 import Categories from './pages/Categories';
 import Product from './pages/Products';
+import Customer from './pages/Customer';
 import User from './pages/User';
 import Order from './pages/Order';
 import NoPage from './pages/NoPage';
+import Register from './auth/Register';
 
 function App() {
   return (
@@ -18,7 +20,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
-          
+          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
             element={
@@ -29,6 +31,7 @@ function App() {
           >
             <Route index element={<Categories />} />
             <Route path="product" element={<Product />} />
+            <Route path="customer" element={<Customer />} />
             <Route path="user" element={<User />} />
             <Route path="order" element={<Order />} />
             <Route path="salesorder" element={<SalesOrder />} />

@@ -16,8 +16,8 @@ export const sidebar = [
   },
   {
     id: 4,
-    label: "Order",
-    path: "/dashboard/order",
+    label: "Customer",
+    path: "/dashboard/customer",
   },
   {
     id: 5,

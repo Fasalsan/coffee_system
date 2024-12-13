@@ -24,7 +24,7 @@ export default function Layout() {
                         </div>
                         <div>
                             <HiOutlineUserCircle
-                                className="text-5xl text-white"
+                                className="text-5xl text-white cursor-pointer"
                                 onClick={() => logout()}
                             />
                         </div>

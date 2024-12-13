@@ -38,7 +38,6 @@ const ModalUser = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' }) 
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <h1>Wellcome</h1>
             <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto">
                 <h2 className="text-xl font-bold mb-4">
                     {mode === 'create' ? 'Create User' : 'Update User'}

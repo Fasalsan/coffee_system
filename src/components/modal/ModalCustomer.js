@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import request from '../../util/helper';
 
-const ModalProduct = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' }) => {
+const ModalCustomer = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' }) => {
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
-        price: '',
-        categoryId: ''
+        phone: '',
+        address: ''
     });
 
     useEffect(() => {
@@ -42,14 +42,14 @@ const ModalProduct = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' 
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto">
                 <h2 className="text-xl font-bold mb-4">
-                    {mode === 'create' ? 'Create Product' : 'Update Product'}
+                    {mode === 'create' ? 'Create Customer' : 'Update Customer'}
                 </h2>
                 <form onSubmit={handleSubmit}
                     className="flex flex-col gap-2"
                 >
                     <input
                         type="text"
-                        placeholder='productName'
+                        placeholder='name'
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
@@ -57,29 +57,21 @@ const ModalProduct = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' 
                     />
                     <input
                         type="text"
-                        placeholder='price'
-                        name="price"
-                        value={formData.price}
+                        placeholder='phone'
+                        name="phone"
+                        value={formData.phone}
                         onChange={handleChange}
                         className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
                     />
-                    {/* Category Select Box */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2">Choose Category</label>
-                        <select
-                            name="categoryId"
-                            value={formData.categoryId}
-                            onChange={handleChange}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-indigo-300"
-                        >
-                            <option value="">Select Category</option>
-                            {category.map((item) => (
-                                <option key={item.id} value={item.id}>
-                                    {item.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                       <input
+                        type="text"
+                        placeholder='address'
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className='w-full px-3 py-2.5 border border-gray-300 focus:border-[#f5a65d] focus:ring-2 focus:ring-[#f5a65d] hover:outline-none rounded-lg'
+                    />
+               
                     <div className="flex justify-end gap-2">
                         <button
                             type="button"
@@ -101,4 +93,4 @@ const ModalProduct = ({ isOpen, onClose, onSubmit, initialData, mode = 'create' 
     );
 };
 
-export default ModalProduct;
+export default ModalCustomer;

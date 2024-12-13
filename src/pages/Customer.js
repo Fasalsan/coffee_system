@@ -4,9 +4,9 @@ import { RiEditFill } from "react-icons/ri";
 import request from '../util/helper';
 import Loading from "../components/shared/Loading";
 import Propconfirm from "../components/Propconfirm";
-import ModalProduct from '../components/modal/ModalProduct';
+import ModalCustomer from '../components/modal/ModalCustomer';
 
-export default function Product() {
+export default function Customer() {
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
@@ -15,8 +15,8 @@ export default function Product() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedData, setSelectedData] = useState(null);
-    const [product, setProduct] = useState([]);
-    const itemsPerPage = 2;
+    const [customer, setCustomer] = useState([]);
+    const itemsPerPage = 7;
     useEffect(() => {
         getProduct();
     }, []);
@@ -42,14 +42,15 @@ export default function Product() {
 
 
     const getProduct = async () => {
-        const response = await request("Product/GetAll", "get")
-        setProduct(response)
+        const response = await request("Customer/GetAll", "get")
+        setCustomer(response)
+        console.log(response)
     }
 
     // CreateNewProduct
     const CreateProduct = async (data) => {
         try {
-            await request(`Product/Post`, "post", data)
+            await request(`Customer/Post`, "post", data)
             await getProduct();
         } catch (error) {
             console.error(error);
@@ -59,7 +60,7 @@ export default function Product() {
     const UpdateProduct = async (data) => {
         const id = isId
         try {
-            await request(`Product/Update?id=${id}`, "Put", data)
+            await request(`Customer/Update?id=${id}`, "Put", data)
             await getProduct();
         } catch (error) {
             console.error(error);
@@ -70,7 +71,7 @@ export default function Product() {
     const DeleteProduct = async () => {
         const id = isId
         try {
-            await request(`Product/Delete?id=${id}`, "delete",)
+            await request(`Customer/Delete?id=${id}`, "delete",)
             await getProduct();
             setLoading(false);
         } catch (err) {
@@ -105,10 +106,10 @@ export default function Product() {
 
 
     // Calculate total pages
-    const totalPages = Math.ceil(product.length / itemsPerPage);
+    const totalPages = Math.ceil(customer.length / itemsPerPage);
 
     // Get the data for the current page
-    const currentData = product.slice(
+    const currentData = customer.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -150,13 +151,13 @@ export default function Product() {
                                 ID
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Product
+                                Name
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Price
+                                Phone
                             </th>
                             <th scope="col" className="px-6 py-3">
-                                Category
+                                Address
                             </th>
                             <th scope="col" className="px-6 py-3">
                                 Action
@@ -171,8 +172,8 @@ export default function Product() {
                                 >
                                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{i + 1}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.price}$</td>
-                                    <td>{item.categoryModel.name
+                                    <td>{item.phone}</td>
+                                    <td>{item.address
                                     }</td>
                                     <td className="px-6 py-4">
                                         <div className='flex gap-4'>
@@ -253,7 +254,7 @@ export default function Product() {
                 </div>
             </Propconfirm>
             {/* Modal */}
-            <ModalProduct
+            <ModalCustomer
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleSubmit}
